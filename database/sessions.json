@@ -1,0 +1,17 @@
+{
+    "savedSession": "True",
+    "lastSession": {
+        "sessionMode": "",
+        "attackSpeed": "",
+        "verboseLevel": "",
+        "useNmap": "",
+        "useNikto": "",
+        "useWfuzz": "",
+        "useDirb": "",
+        "useGobuster": "",
+        "useWpscan": "",
+        "useWapiti": "",
+        "useJoomscan": "",
+        "useW3af": ""
+    }
+}

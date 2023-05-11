@@ -1,17 +1,16 @@
 {
     "savedSession": "True",
     "lastSession": {
-        "sessionMode": "",
-        "attackSpeed": "",
-        "verboseLevel": "",
-        "useNmap": "",
-        "useNikto": "",
-        "useWfuzz": "",
-        "useDirb": "",
-        "useGobuster": "",
-        "useWpscan": "",
-        "useWapiti": "",
-        "useJoomscan": "",
-        "useW3af": ""
+        "sessionMode": "A",
+        "attackSpeed": "S",
+        "verboseLevel": "L",
+        "useNmap": "y",
+        "useNikto": "y",
+        "useWfuzz": "y",
+        "useDirb": "y",
+        "useWpscan": "y",
+        "useWapiti": "y",
+        "useJoomscan": "y",
+        "useW3af": "y"
     }
 }

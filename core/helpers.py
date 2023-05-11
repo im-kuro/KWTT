@@ -5,20 +5,26 @@ init()
 # the class for the input/output functions
 class IOFuncs:
 
+
+	class Verbose:
+		def printError(Error: str, Exeption: str) ->  str: print(f"{Fore.RED} + [ERROR] --> {Error} \nExeption --> {Exeption}{Style.RESET_ALL}") 
+		def printSuccess(Success: str) ->  str: print(f"{Fore.GREEN} + [SUCCESS] --> {Success}{Style.RESET_ALL}") 
+		def printInfo(Info: str) ->  str: print(f"{Fore.BLUE} + [INFO] --> {Info}{Style.RESET_ALL}") 
+		def getUserInput(Input: str) ->  str: return input(f"{Fore.MAGENTA} + [INPUT] --> {Input} y/n: {Style.RESET_ALL}") 
+
 	class Debug:
-		def printError(Error: str, Exeption: str) -> bool: print(f"{Fore.RED} + [ERROR] --> {Error} \nExeption --> {Exeption}{Style.RESET_ALL}"); return True
-		def printSuccess(Success: str) -> bool: print(f"{Fore.GREEN} + [SUCCESS] --> {Success}{Style.RESET_ALL}"); return True
-		def printInfo(Info: str) -> bool: print(f"{Fore.BLUE} + [INFO] --> {Info}{Style.RESET_ALL}"); return True
-		def getUserInput(Input: str) -> bool: return input(f"{Fore.MAGENTA} + [INPUT] --> {Input} y/n: {Style.RESET_ALL}"); return True
+		def printError(Error: str, Exeption: str) ->  str: print(f"{Fore.RED} + [ERROR] --> {Error} \nExeption --> {Exeption}{Style.RESET_ALL}") 
+		def printSuccess(Success: str) ->  str: print(f"{Fore.GREEN} + [SUCCESS] --> {Success}{Style.RESET_ALL}") 
+		def printInfo(Info: str) ->  str: print(f"{Fore.BLUE} + [INFO] --> {Info}{Style.RESET_ALL}") 
+		def getUserInput(Input: str) ->  str: return input(f"{Fore.MAGENTA} + [INPUT] --> {Input} y/n: {Style.RESET_ALL}") 
 
 	class Default:
-		def printError(Error: str) -> bool: print(f"{Fore.RED} + [ERROR] --> {Error}{Style.RESET_ALL}"); return True
-		def printSuccess(Success: str) -> bool: print(f"{Fore.GREEN} + [SUCCESS] --> {Success}{Style.RESET_ALL}"); return True
-		def printInfo(Info: str) -> bool: print(f"{Fore.BLUE} + [INFO] --> {Info}{Style.RESET_ALL}"); return True
-		def getUserInput(Input: str) -> bool: return input(f"{Fore.MAGENTA} + [INPUT] --> {Input} y/n: {Style.RESET_ALL}"); return True
-		def getMultiOptionInput(Input: str, q1, q2, q3) -> bool: return input(f"{Fore.MAGENTA} + [INPUT] --> {Input} ({q1} or {q2} or {q3}): {Style.RESET_ALL}"); return True
-
-
+		def printError(Error: str) ->  str: print(f"{Fore.RED} + [ERROR] --> {Error}{Style.RESET_ALL}") 
+		def printSuccess(Success: str) ->  str: print(f"{Fore.GREEN} + [SUCCESS] --> {Success}{Style.RESET_ALL}") 
+		def printInfo(Info: str) ->  str: print(f"{Fore.BLUE} + [INFO] --> {Info}{Style.RESET_ALL}") 
+		def getUserInput(Input: str) ->  str: return input(f"{Fore.MAGENTA} + [INPUT] --> {Input} y/n: {Style.RESET_ALL}") 
+		def getMultiOptionInput(Input: str, q1, q2, q3) ->  str: return input(f"{Fore.MAGENTA} + [INPUT] --> {Input} ({q1} or {q2} or {q3}): {Style.RESET_ALL}") 
+		def getTextInput(Input: str) -> str: return input(f"{Fore.MAGENTA} + [INPUT] --> {Input}: {Style.RESET_ALL}")
 
 
 
@@ -85,21 +91,47 @@ class Menu:
 		Returns:
 			_type_: _description_
 		"""
-  
-		sessionMode = IOFuncs.Default.getMultiOptionInput("Attack Mode", "Agressive/A", "Silent/S", "Quiet/Q")
-		attackSpeed = IOFuncs.Default.getMultiOptionInput("Attack Speed", "Slow/S", "Medium/M", "Fast/F")
-		verboseLevel = IOFuncs.Default.getMultiOptionInput("Verbose Level", "Low/L", "Medium/M", "High/H")
+		# Function to get user input and validate against the options
+		def getValidInput(prompt, *options):
+			while True:
+				user_input = IOFuncs.Default.getMultiOptionInput(prompt, options[0][0], options[1][0], options[2][0]).strip().lower()
+				for option in options:
+					if user_input == option[0].lower() or user_input == option[1].lower():
+						return option[1]
+				print("Error: Invalid input. Please try again.")
+
+		# Prompt for Attack Mode
+		sessionMode = getValidInput("Attack Mode (Agressive/a, Silent/s, Default/d)",
+									("Agressive", "A"), ("Silent", "S"), ("Default", "D"))
+
+		# Prompt for Attack Speed
+		attackSpeed = getValidInput("Attack Speed (Slow/s, Medium/m, Fast/f)",
+									("Slow", "S"), ("Medium", "M"), ("Fast", "F"))
+
+		# Prompt for Verbose Level
+		verboseLevel = getValidInput("Verbose Level (Low/l, Medium/m, High/h)",
+								("Low", "L"), ("Medium", "M"), ("High", "H"))
+
+
 		useNmap = IOFuncs.Default.getUserInput("Use Nmap? (https://nmap.org/)")
 		useNikto = IOFuncs.Default.getUserInput("Use Nikto? (https://cirt.net/Nikto2)")
 		useWfuzz = IOFuncs.Default.getUserInput("Use Wfuzz? (https://www.kali.org/tools/wfuzz/)")
 		useDirb = IOFuncs.Default.getUserInput("Use Dirb? (https://tools.kali.org/web-applications/dirb)")
-		useGobuster = IOFuncs.Default.getUserInput("Use Gobuster? (https://tools.kali.org/web-applications/gobuster)")
 		useWpscan = IOFuncs.Default.getUserInput("Use Wpscan? (https://wpscan.org/)")
 		useWapiti = IOFuncs.Default.getUserInput("Use Wapiti? (https://wapiti.sourceforge.io/)")
 		useJoomscan = IOFuncs.Default.getUserInput("Use Joomscan? (https://www.kali.org/tools/joomscan/)")
 		useW3af = IOFuncs.Default.getUserInput("Use W3af? (https://www.kali.org/tools/w3af/)")
   
-		return {"sessionMode": sessionMode, "attackSpeed": attackSpeed, "verboseLevel": verboseLevel, "useNmap": useNmap, "useNikto": useNikto, "useWfuzz": useWfuzz, "useDirb": useDirb, "useGobuster": useGobuster, "useWpscan": useWpscan, "useWapiti": useWapiti, "useJoomscan": useJoomscan, "useW3af": useW3af}
+		return {"sessionMode": sessionMode, "attackSpeed": attackSpeed, "verboseLevel": verboseLevel, "useNmap": useNmap, "useNikto": useNikto, "useWfuzz": useWfuzz, "useDirb": useDirb, "useWpscan": useWpscan, "useWapiti": useWapiti, "useJoomscan": useJoomscan, "useW3af": useW3af}
 
 	def saveSessionConfig():
+		pass
+
+
+	def checkForTools():
+		""" Checks for all needed tools to run, and if theyre not there it will install them
+	
+		Returns:
+			_type_: _description_
+		"""
 		pass

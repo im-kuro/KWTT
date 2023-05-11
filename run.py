@@ -1,7 +1,9 @@
 # made by @devkuro - GH: im-kuro
+from core import tools
 from core import helpers
 from core import databseHelpers
 import argparse, json
+from multiprocessing import Process
 
 argsToParse = argparse.ArgumentParser(description="Kuros Web Testing Tool - @devkuro - GH: im-kuro")
 
@@ -57,20 +59,36 @@ class Menu():
 
 				if saveSesh == True:
 					debug.printSuccess("Saved session config!")
-
+			return sessionConfig
 		except Exception as e:
 			if self.debugOn == True: debug.printError("Error with sessions", str(e))
 			elif self.debugOn == False: default.printError("Error with sessions")
 		""" _____________________ """
   
 		""" SETUP SCANS """
-  
-  
-  
-  
-  
-  
-		""" _____________________ """
+	
+ 
+	
+	
+	def initThreads(self, sessionConfig: json):
+		"""Here is where we will init needed threads for ALL tools
+			this will use the tools.py to passing the sessionMode and attackSpeed
+		Args:
+			sessionConfig (json): _description_
+		"""
+		tarIP = default.getTextInput("Enter target IP and Port (120.0.0.1:443)")
+	
+ 
+		# init all tool classes
+		NMAPClass = tools.NMAP(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"], sessionConfig["verboseLevel"])
+	
+ 
+		# run threads
+		if sessionConfig["useNmap"] == "y" or "Y": NMAPPROC = Process(target=NMAPClass.nmapScanHandler())
+		print(NMAPPROC)
+    
+    
+		""" __________ """
 
   
 	
@@ -80,5 +98,8 @@ class Menu():
 if __name__ == "__main__":
 		menu = Menu()
 
-		menu.main()
-	
+		seshConfig = menu.main()
+  
+
+  
+		menu.initThreads(seshConfig)

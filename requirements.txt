@@ -3,3 +3,4 @@ argparse
 colorama
 random
 time
+python-nmap

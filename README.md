@@ -17,6 +17,7 @@ them.
 - [x] Toolkits of diffrent scans
 - [x] Vulnerability Scanning
 - [x] Verbose outputs & debug output
+- [x] Proxy Support
 - [x] & more!
 
 

@@ -6,6 +6,7 @@ debug = helpersClass.Debug
 default = helpersClass.Default
 
 
+
 class databaseHelpers:
     def __init__(self, debugOn: bool = False)-> bool:
         self.debug = debugOn 

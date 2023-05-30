@@ -85,8 +85,8 @@ class Menu():
  
 		# run threads
 		if sessionConfig["useNmap"] == "y" or "Y": NMAPPROC = Process(target=NMAPClass.nmapScanHandler())
-		print(NMAPPROC)
-    
+		if sessionConfig["useNikto"] == "y" or "Y": NIKTOPROC = Process(target=NMAPClass.nmapScanHandler())
+	
     
 		""" __________ """
 

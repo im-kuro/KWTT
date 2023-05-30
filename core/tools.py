@@ -8,34 +8,36 @@ default = helpersClass.Default
 
 
 
-class NMAP():
+class toolHandler():
 	def __init__(self, ip: str, sessionMode: str, attackSpeed: str, verboseLevel: str = "Low", debugOn: bool = False):
 		self.ip = ip
 		self.sessionMode = sessionMode
 		self.attackSpeed = attackSpeed
 		self.debugOn = debugOn
 		self.verboseLevel = verboseLevel
+		self.nmap = nmap.PortScanner()
+  
+  
 		# later we will add a check to see if nmap is installed along with other tools (helpers.py->Menu())
-		try:
-			self.nm = nmap.PortScanner()
-		except Exception as e:
-			if self.debugOn == True: debug.printError(e)
- 
- 
+		#try:
+		#	self.nmap = nmap.PortScanner()
+		#except Exception as e:
+		#	if self.debugOn == True: debug.printError(e)
+
 	def nmapScanHandler(self):
 	
 		if self.sessionMode == "a" or "A":			
 			scanResults = {"agressiveScan": {}}
 			if self.attackSpeed == "s" or "S":
-				speed="T1"
+				speed= "T1"
 			if self.attackSpeed == "m" or "M":
-				speed="T2"
+				speed= "T2"
 			if self.attackSpeed == "f" or "F":
-				speed="T4"
+				speed= "T4"
 
-			scan1 = self.nm.command_line(f"nmap -sU	-sS -{speed} -A -v {self.verboseLevel} {self.ip}")
-			scan2 = self.nm.command_line(f"nmap -O -sF -{speed}  -A -v {self.verboseLevel} {self.ip}")
-			scan3 = self.nm.command_line(f"nmap -p- -sV -{speed} -v {self.verboseLevel} {self.ip}")
+			scan1 = self.nmap.command_line(f"nmap -sU	-sS -{speed} -A -v {self.verboseLevel} {self.ip}")
+			scan2 = self.nmap.command_line(f"nmap -O -sF -{speed}  -A -v {self.verboseLevel} {self.ip}")
+			scan3 = self.nmap.command_line(f"nmap -p- -sV -{speed} -v {self.verboseLevel} {self.ip}")
 
 			scanResults["agressiveScan"]["scan1"] = scan1
 			scanResults["agressiveScan"]["scan2"] = scan2
@@ -49,8 +51,21 @@ class NMAP():
 			scanResults = {"defaultScan": {}}
 		
 			
+	def niktoHandler(self):
+		pass
 
 
-
-class Nikto:
-    pass
+	def wfuzzHandler(self):
+		pass
+  
+	def dirbHandler(self):
+		pass
+  
+	def wpscanHandler(self):
+		pass
+  
+	def wapitiHandler(self):
+		pass
+  
+	def joomscanHandler(self):
+		pass

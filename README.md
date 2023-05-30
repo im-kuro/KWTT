@@ -8,18 +8,21 @@ Its meant to be treated as a web scanner that provides in depth info about the t
 target. It should alert to possible vulnerabilities and provide info about the target. It will not exploit the vulnerabilities, but it will alert you to 
 them. 
 
-
-### 1.0 Features	
-- [x] Subdomain Enumeration
+#### Exeptected date: 6/30/23
+### 1.0 Features
 - [x] Port Scanning
 - [x] Directory Bruteforcing
-- [x] File Upload Bruteforcing
 - [x] Toolkits of diffrent scans
 - [x] Vulnerability Scanning
 - [x] Verbose outputs & debug output
-- [x] Proxy Support
 - [x] & more!
 
+
+### Future Features
+- [x] Subdomain Enumeration
+- [x] File Upload Bruteforcing
+- [x] Proxy Support
+- [x] IP list scanning for automation of scans (you can pass in a json/txt file with a list of ips to auto scan, sorting them based off how vulnerable  they are)
 
 ### >1.0 Installation & Usage
 #### Install Needed Libs

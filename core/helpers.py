@@ -1,5 +1,7 @@
 from colorama import Fore, Style, init
-import random, time
+import random, time, os
+import subprocess
+
 init()
 
 # the class for the input/output functions
@@ -82,11 +84,11 @@ class Menu:
 		randLogo = random.choice(arrayOfLogos)
 
 		for line in randLogo.splitlines():
-			print(line)
-			time.sleep(0.1)
+			print(Fore.RED +  line)
+			time.sleep(0.2)
 		
 	def getSessionConfig():
-		"""_summary_
+		""" ask the user all needed questions to get config
 
 		Returns:
 			_type_: _description_
@@ -120,18 +122,42 @@ class Menu:
 		useWpscan = IOFuncs.Default.getUserInput("Use Wpscan? (https://wpscan.org/)")
 		useWapiti = IOFuncs.Default.getUserInput("Use Wapiti? (https://wapiti.sourceforge.io/)")
 		useJoomscan = IOFuncs.Default.getUserInput("Use Joomscan? (https://www.kali.org/tools/joomscan/)")
-		useW3af = IOFuncs.Default.getUserInput("Use W3af? (https://www.kali.org/tools/w3af/)")
-  
-		return {"sessionMode": sessionMode, "attackSpeed": attackSpeed, "verboseLevel": verboseLevel, "useNmap": useNmap, "useNikto": useNikto, "useWfuzz": useWfuzz, "useDirb": useDirb, "useWpscan": useWpscan, "useWapiti": useWapiti, "useJoomscan": useJoomscan, "useW3af": useW3af}
 
-	def saveSessionConfig():
-		pass
+		return {"sessionMode": sessionMode, "attackSpeed": attackSpeed, "verboseLevel": verboseLevel, "useNmap": useNmap, "useNikto": useNikto, "useWfuzz": useWfuzz, "useDirb": useDirb, "useWpscan": useWpscan, "useWapiti": useWapiti, "useJoomscan": useJoomscan}
 
 
-	def checkForTools():
+	def checkForTools() -> bool:
 		""" Checks for all needed tools to run, and if theyre not there it will install them
 	
 		Returns:
-			_type_: _description_
+			bool: true = worked false = no workeded
 		"""
-		pass
+		arrOfTools = ["nmap", "nikto", "wfuzz", "dirb", "wpscan", "wapiti", "joomscan"]
+		uninstalledTools = []
+
+		for x in arrOfTools:
+
+			if os.path.exists(f"/usr/bin/{x}"):
+				continue
+			else:
+				uninstalledTools.append(x)
+
+				
+		if not uninstalledTools:
+			IOFuncs.Default.printSuccess("Looks like you have all needed tools!")
+		else:
+			userAns = IOFuncs.Default.printError("Looks like your missing some tools, would you like to install them now? (you may need to re-run with sudo)")
+			if userAns == "y" or "Y":
+				for x in uninstalledTools:
+					print(Fore.GREEN + " + [INFO] Installing --> " + x )
+					try:
+						z = subprocess.check_output(f"sudo apt install {x}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+						print(Fore.GREEN + " + [INFO] Success installing! --> " + x )
+					except subprocess.CalledProcessError: IOFuncs.Default.printError("Error installing tool. Please try again later.")
+						
+
+
+
+
+
+

@@ -7,8 +7,9 @@ from multiprocessing import Process
 
 argsToParse = argparse.ArgumentParser(description="Kuros Web Testing Tool - @devkuro - GH: im-kuro")
 
-
+argsToParse.add_argument("--lastScan", "-l", help="Show last scan results", default=False, action='store_true')
 argsToParse.add_argument("--debug", "-d", help="Run with debug output", default=False, action='store_true')
+argsToParse.add_argument("--fix", "-f", help="Fix broken features", default=False, action='store_true')
 
 argParsedObj = argsToParse.parse_args()
 
@@ -21,6 +22,13 @@ default = helpersClass.Default
 
 database = databseHelpers.databaseHelpers(debugOn=argParsedObj.debug)
 
+
+if argParsedObj.fix == True:
+	database.BROKEN_DATABASE_CLEANUP()
+
+if argParsedObj.lastScan == True:
+	showPrevScan()
+
 class Menu():
 
 	def __init__(self):
@@ -32,14 +40,17 @@ class Menu():
 		
 		# show dumb logos
 		menuHelpers.startupMenu(menuHelpers.arrayOfLogos)
-  
+
+		# check for tools
+		menuHelpers.checkForTools()
+
 		""" SETUP SESSION CONFIG """
 		pastSession = database.getPastSession()
 
 		try:
 			if pastSession["savedSession"] == "True":
 				# gets the question answer
-				q = default.getUserInput("Would you like to load your last session?: ")
+				q = default.getUserInput("Would you like to load your last session?")
 				# if yes, load the last session
 				if q == "y" or q == "Y":
 					sessionConfig = pastSession["lastSession"]
@@ -76,22 +87,31 @@ class Menu():
 		Args:
 			sessionConfig (json): _description_
 		"""
-		tarIP = default.getTextInput("Enter target IP and Port (120.0.0.1:443)")
-	
- 
+		tarIP = default.getTextInput("Enter target IP and Port (127.0.0.1:443)")
+		if tarIP == "":
+			tarIP = "127.0.0.1"
+
 		# init all tool classes
 		NMAPClass = tools.NMAP(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"], sessionConfig["verboseLevel"])
 	
  
 		# run threads
 		if sessionConfig["useNmap"] == "y" or "Y": NMAPPROC = Process(target=NMAPClass.nmapScanHandler())
-		if sessionConfig["useNikto"] == "y" or "Y": NIKTOPROC = Process(target=NMAPClass.nmapScanHandler())
-	
+		
+    
     
 		""" __________ """
 
-  
+
+	def showPrevScan(self):
+		scanRes = database.getScanResults(None)
 	
+		for tool in scanRes:
+			for scan in tool:
+				print(scan)
+
+
+
 
 
         

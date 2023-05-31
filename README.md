@@ -1,4 +1,4 @@
-# Kuros WTT v0.1
+# Kuros WTT v0.2
 ## (Web Testing Toolkit)
 
 ## 1.0 Introduction

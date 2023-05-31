@@ -4,12 +4,16 @@ from core import helpers
 from core import databseHelpers
 import argparse, json
 from multiprocessing import Process
+from colorama import Fore
 
 argsToParse = argparse.ArgumentParser(description="Kuros Web Testing Tool - @devkuro - GH: im-kuro")
 
-argsToParse.add_argument("--lastScan", "-l", help="Show last scan results", default=False, action='store_true')
-argsToParse.add_argument("--debug", "-d", help="Run with debug output", default=False, action='store_true')
 argsToParse.add_argument("--fix", "-f", help="Fix broken features", default=False, action='store_true')
+argsToParse.add_argument("--lastScan", "-l", help="Show last scan results", default=False, action='store_true')
+argsToParse.add_argument("--wordlist", "-w", help="The wordlist youd like to use for dirb", default=None)
+
+
+argsToParse.add_argument("--debug", "-d", help="Run with debug output", default=False, action='store_true')
 
 argParsedObj = argsToParse.parse_args()
 
@@ -23,23 +27,17 @@ default = helpersClass.Default
 database = databseHelpers.databaseHelpers(debugOn=argParsedObj.debug)
 
 
-if argParsedObj.fix == True:
-	database.BROKEN_DATABASE_CLEANUP()
 
-if argParsedObj.lastScan == True:
-	showPrevScan()
 
 class Menu():
 
 	def __init__(self):
 		self.debugOn = argParsedObj.debug
 		print("Debug mode: {0}".format(self.debugOn))
-		pass
+		
 
 	def main(self):
 		
-		# show dumb logos
-		menuHelpers.startupMenu(menuHelpers.arrayOfLogos)
 
 		# check for tools
 		menuHelpers.checkForTools()
@@ -87,28 +85,31 @@ class Menu():
 		Args:
 			sessionConfig (json): _description_
 		"""
-		tarIP = default.getTextInput("Enter target IP and Port (127.0.0.1:443)")
-		if tarIP == "":
-			tarIP = "127.0.0.1"
-
+		tarIP = default.getTextInput("Enter target IP and Port ex. (127.0.0.1:443)")
+		if tarIP == "": # this is just for ease of development
+			tarIP = "127.0.0.1:5000"
+		
 		# init all tool classes
 		NMAPClass = tools.NMAP(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"], sessionConfig["verboseLevel"])
+		NIKTOClass = tools.Nikto(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
+		WFUZZClass = tools.wfuzz(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
+		DRIBClass = tools.dirb(tarIP, argParsedObj.wordlist)
+		# run procs
+		#if sessionConfig["useNmap"] == "y" or "Y": NMAPPROC = Process(target=NMAPClass.nmapScanHandler())
+		#if sessionConfig["useNikto"] == "y" or "Y": NIKTOPROC = Process(target=NIKTOClass.niktoScanHandler())
+		#if sessionConfig["useWfuzz"] == "y" or "Y": WFUZZPROC = Process(target=WFUZZClass.wfuzzScanHandler())
+		if sessionConfig["useDirb"] == "y" or "Y": DIRBPROC = Process(target=DRIBClass.gobusterScanHandler())
 	
- 
-		# run threads
-		if sessionConfig["useNmap"] == "y" or "Y": NMAPPROC = Process(target=NMAPClass.nmapScanHandler())
-		
-    
-    
-		""" __________ """
 
 
 	def showPrevScan(self):
 		scanRes = database.getScanResults(None)
 	
 		for tool in scanRes:
-			for scan in tool:
-				print(scan)
+			for scanType in scanRes[tool]:
+				for scan in scanRes[tool][scanType]:
+					print(Fore.RED + menuHelpers.jsonOFTools[tool])
+					print(f"{scanRes[tool][scanType][scan]}")
 
 
 
@@ -117,9 +118,17 @@ class Menu():
         
 if __name__ == "__main__":
 		menu = Menu()
+		menuHelpers.startupMenu(menuHelpers.arrayOfLogos)
+
+		if argParsedObj.fix == True:
+			database.BROKEN_DATABASE_CLEANUP()
+			exit(0)
+
+		if argParsedObj.lastScan == True:
+			menu.showPrevScan()
+			exit(0)
 
 		seshConfig = menu.main()
-  
 
-  
+
 		menu.initThreads(seshConfig)

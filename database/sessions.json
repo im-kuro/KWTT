@@ -11,6 +11,6 @@
         "useWpscan": "y",
         "useWapiti": "y",
         "useJoomscan": "y",
-        "useW3af": "y"
+
     }
 }

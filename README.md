@@ -15,6 +15,14 @@ It will not exploit the vulnerabilities, but it will alert you to them.
 (this script is the automation of many other tools)
 
 
+(v0.3)
+
+
+https://github.com/im-kuro/KWTT/assets/86091489/17bc3300-adb0-499e-b1e2-227d787e6316
+
+
+
+
 #### Exeptected date: 6/30/23
 ### 1.0 Features
 - [x] Port Scanning

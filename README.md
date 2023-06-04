@@ -1,4 +1,4 @@
-# Kuros WTT v0.1
+# Kuros WTT v0.3
 ## (Web Testing Toolkit)
 
 [x] + https://linktr.ee/devkuro  <3
@@ -46,3 +46,4 @@ https://github.com/im-kuro/KWTT/assets/86091489/17bc3300-adb0-499e-b1e2-227d787e
 
 #### Run the script
 ```$ python3 run.py```
+

@@ -10,7 +10,7 @@
         "useDirb": "y",
         "useWpscan": "y",
         "useWapiti": "y",
-        "useJoomscan": "y",
-        "useW3af": "y"
+        "useJoomscan": "y"
+
     }
 }

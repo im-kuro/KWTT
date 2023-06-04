@@ -53,9 +53,10 @@ class Menu():
 				if q == "y" or q == "Y":
 					sessionConfig = pastSession["lastSession"]
      
-				elif q == "n" or "N":
+				elif q == "n" or q == "N":
 					default.printInfo("Please make a new session config.\n")
 					sessionConfig = menuHelpers.getSessionConfig()
+					
 					saveSesh = database.saveUserSession(sessionConfig)
 					if saveSesh == True:
 						debug.printSuccess("Saved session config!")
@@ -70,7 +71,7 @@ class Menu():
 					debug.printSuccess("Saved session config!")
 			return sessionConfig
 		except Exception as e:
-			if self.debugOn == True: debug.printError("Error with sessions", str(e))
+			if self.debugOn == True: debug.printError("Error with sessions", str(e), sessionConfig)
 			elif self.debugOn == False: default.printError("Error with sessions")
 		""" _____________________ """
   
@@ -92,19 +93,35 @@ class Menu():
 		# init all tool classes
 		NMAPClass = tools.NMAP(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"], sessionConfig["verboseLevel"])
 		NIKTOClass = tools.Nikto(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
-		WFUZZClass = tools.wfuzz(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
+		#WFUZZClass = tools.wfuzz(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
 		DRIBClass = tools.dirb(tarIP, argParsedObj.wordlist)
+		WPSCANClass = tools.wpscan(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
+		
 		# run procs
-		#if sessionConfig["useNmap"] == "y" or "Y": NMAPPROC = Process(target=NMAPClass.nmapScanHandler())
-		#if sessionConfig["useNikto"] == "y" or "Y": NIKTOPROC = Process(target=NIKTOClass.niktoScanHandler())
-		#if sessionConfig["useWfuzz"] == "y" or "Y": WFUZZPROC = Process(target=WFUZZClass.wfuzzScanHandler())
-		if sessionConfig["useDirb"] == "y" or "Y": DIRBPROC = Process(target=DRIBClass.gobusterScanHandler())
-	
-
+		try:
+			if sessionConfig["useNmap"] == "y" or "Y": 
+				default.printInfo("NMAPPROC Running...")
+				NMAPPROC = Process(target=NMAPClass.nmapScanHandler())
+			if sessionConfig["useNikto"] == "y" or "Y": 
+				default.printInfo("NIKTOPROC Running...")
+				NIKTOPROC = Process(target=NIKTOClass.niktoScanHandler())
+			#if sessionConfig["useWfuzz"] == "y" or "Y": 
+			#	default.printInfo("WFUZZPROC Running...")
+			#	WFUZZPROC = Process(target=WFUZZClass.wfuzzScanHandler())
+			if sessionConfig["useDirb"] == "y" or "Y": 
+				default.printInfo("DIRBPROC Running...")
+				DIRBPROC = Process(target=DRIBClass.gobusterScanHandler())
+			if sessionConfig["useWpscan"] == "y" or "Y": 
+				default.printInfo("WPSCANPROC Running...")
+				WPSCANPROC = Process(target=WPSCANClass.wpscanScanHandler())
+		except Exception as e:
+			print(e)
+			print("Re-run the script with sudo and try again")
+			print("~$ sudo python3 run.py")
 
 	def showPrevScan(self):
 		scanRes = database.getScanResults(None)
-	
+		print(scanRes)
 		for tool in scanRes:
 			for scanType in scanRes[tool]:
 				for scan in scanRes[tool][scanType]:
@@ -117,18 +134,31 @@ class Menu():
 
         
 if __name__ == "__main__":
-		menu = Menu()
-		menuHelpers.startupMenu(menuHelpers.arrayOfLogos)
+	while True:
+		try:
+			menu = Menu()
+			menuHelpers.startupMenu(menuHelpers.arrayOfLogos)
 
-		if argParsedObj.fix == True:
-			database.BROKEN_DATABASE_CLEANUP()
-			exit(0)
+			if argParsedObj.fix == True:
+				database.BROKEN_DATABASE_CLEANUP()
+				exit(0)
 
-		if argParsedObj.lastScan == True:
-			menu.showPrevScan()
-			exit(0)
+			if argParsedObj.lastScan == True:
+				menu.showPrevScan()
+				exit(0)
 
-		seshConfig = menu.main()
+			seshConfig = menu.main()
 
-
-		menu.initThreads(seshConfig)
+			try:	
+				menu.initThreads(seshConfig)
+				default.printInfo("Goodbye, thanks for using KWTT")
+				break
+			except Exception as e: debug.printError("Unknown error starting procs", e)
+				
+		except KeyboardInterrupt:
+			z = default.getUserInput("Are you sure you want to exit the program?")
+			if z == "y" or z == "Y":
+				default.printInfo("Goodbye, thanks for using KWTT")
+				break
+			else: continue
+			

@@ -11,8 +11,7 @@ class databaseHelpers:
     def __init__(self, debugOn: bool = False)-> bool:
         self.debug = debugOn 
         try: 
-            self.scanResults = json.loads(open("database/scanResults.json").read())
-            self.sessionDatase = json.loads(open("database/sessions.json").read())
+            self.debugOn = debugOn
         except FileNotFoundError:
             print("Error with database. Resetting the databse")
             self.BROKEN_DATABASE_CLEANUP()
@@ -25,35 +24,58 @@ class databaseHelpers:
         if not os.path.exists("database/sessions.json"):
             # Create sessions.json
             with open("database/sessions.json", 'w') as file:
-                json.dump({}, file)
+                json.dump({
+                    "savedSession": "True",
+                    "lastSession": {
+                        "sessionMode": "A",
+                        "attackSpeed": "S",
+                        "verboseLevel": "L",
+                        "useNmap": "n",
+                        "useNikto": "n",
+                        "useWfuzz": "n",
+                        "useDirb": "n",
+                        "useWpscan": "n",
+                        "useWapiti": "n",
+                        "useJoomscan": "n"
+                    }}, file)
 
         # Check if scanResults.json exists
      
         if not os.path.exists("database/scanResults.json"):
             # Create scanResults.json
             with open("database/scanResults.json", 'w') as file:
-                json.dump({}, file)
+                json.dump({
+                    "nmap": {},
+                    "nikto": {},
+                    "wfuzz": {},
+                    "gobuster": {},
+                    "wpscan": {}
+                }, file)
 
 
 
     # saves the settings a user is using 
     def saveUserSession(self, sessionData: json) -> bool:
         
-        try:
-            self.sessionDatase["savedSession"] = True
-            self.sessionDatase["lastSession"] = sessionData
-          
-            json.dump(self.sessionDatase, open("database/sessions.json", "w"))            
+        #try:
+        sessionsDB = json.loads(open("database/sessions.json").read())
+
         
-        except Exception as e:
-            if self.debugOn == True: debug.printError(e)
-            return False
+        sessionsDB = sessionData
+        sessionsDB["savedSession"] = "True"
+        
+        json.dump(sessionsDB, open("database/sessions.json", "w"))            
+        
+        #except Exception as e:
+        #    if self.debugOn == True: debug.printError("error saving user session",e)
+        #    return False
         
 
     # returns the past session
     def getPastSession(self) -> bool:
         try:
-            return self.sessionDatase
+            sessionsDB = json.loads(open("database/sessions.json").read())
+            return sessionsDB
 
         except Exception as e:
             if self.debugOn == True: debug.printError(e)
@@ -64,19 +86,24 @@ class databaseHelpers:
     # saves scan results to database
     def saveScanResults(self, toolName: str, scanRes: json) -> bool:
         try:
-            self.scanResults[toolName] = scanRes
-            json.dump(self.scanResults, open("database/scanResults.json", "w"))   
+            scanResultsDB = json.loads(open("database/scanResults.json", "r").read())
+            scanResultsDB[toolName] = scanRes
+       
+            json.dump(scanResultsDB, open("database/scanResults.json", "w"))   
+        
         except Exception as e:
-            if self.debugOn == True: debug.printError(e)
+            if self.debugOn == True: debug.printError("Error with saving scan results", e)
             return False
 
 
     def getScanResults(self, toolName: str):
         try:
+            scanResultsDB = json.loads(open("database/scanResults.json", "r").read())
             if toolName == None:
-                return self.scanResults
+                return scanResultsDB
             else:
-                return self.scanResults[toolName]
+                return scanResults[toolName]
         except Exception as e:
             if self.debugOn == True: debug.printError(e)
             return False
+

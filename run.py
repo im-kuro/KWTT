@@ -2,8 +2,7 @@
 from core import tools
 from core import helpers
 from core import databseHelpers
-import argparse, json
-from multiprocessing import Process
+import argparse, json, os
 from colorama import Fore
 
 argsToParse = argparse.ArgumentParser(description="Kuros Web Testing Tool - @devkuro - GH: im-kuro")
@@ -24,15 +23,11 @@ debug = helpersClass.Debug
 default = helpersClass.Default
 
 
-database = databseHelpers.databaseHelpers(debugOn=argParsedObj.debug)
-
-
-
-
 class Menu():
 
 	def __init__(self):
 		self.debugOn = argParsedObj.debug
+		self.database = databseHelpers.databaseHelpers(debugOn=argParsedObj.debug)
 		print("Debug mode: {0}".format(self.debugOn))
 		
 
@@ -43,36 +38,38 @@ class Menu():
 		menuHelpers.checkForTools()
 
 		""" SETUP SESSION CONFIG """
-		pastSession = database.getPastSession()
-
+		pastSession = self.database.getPastSession()
+		
 		try:
 			if pastSession["savedSession"] == "True":
-				# gets the question answer
-				q = default.getUserInput("Would you like to load your last session?")
-				# if yes, load the last session
-				if q == "y" or q == "Y":
-					sessionConfig = pastSession["lastSession"]
-     
-				elif q == "n" or q == "N":
+					# gets the question answer
+				q = default.getUserInput("Would you like to load your last session?").lower()
+					# if yes, load the last session
+				if q == "y":
+					sessionConfig = pastSession
+		
+				elif q == "n":
 					default.printInfo("Please make a new session config.\n")
 					sessionConfig = menuHelpers.getSessionConfig()
-					
-					saveSesh = database.saveUserSession(sessionConfig)
+						
+					saveSesh = self.database.saveUserSession(sessionConfig)
 					if saveSesh == True:
 						debug.printSuccess("Saved session config!")
-      
+		
 			elif pastSession["savedSession"] == "False":
-				# but if they dont have a past sesh saved, ask them to make one
+					# but if they dont have a past sesh saved, ask them to make one
 				sessionConfig = menuHelpers.getSessionConfig()
 
-				saveSesh = database.saveUserSession(sessionConfig)
+				saveSesh = self.database.saveUserSession(sessionConfig)
 
 				if saveSesh == True:
 					debug.printSuccess("Saved session config!")
+			
 			return sessionConfig
 		except Exception as e:
-			if self.debugOn == True: debug.printError("Error with sessions", str(e), sessionConfig)
+			if self.debugOn == True: debug.printError("Error with sessions", str(e))
 			elif self.debugOn == False: default.printError("Error with sessions")
+
 		""" _____________________ """
   
 		""" SETUP SCANS """
@@ -93,39 +90,38 @@ class Menu():
 		# init all tool classes
 		NMAPClass = tools.NMAP(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"], sessionConfig["verboseLevel"])
 		NIKTOClass = tools.Nikto(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
-		#WFUZZClass = tools.wfuzz(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
 		DRIBClass = tools.dirb(tarIP, argParsedObj.wordlist)
-		WPSCANClass = tools.wpscan(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
-		
+		WAPITIClass = tools.wapiti(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
+
 		# run procs
-		try:
-			if sessionConfig["useNmap"] == "y" or "Y": 
-				default.printInfo("NMAPPROC Running...")
-				NMAPPROC = Process(target=NMAPClass.nmapScanHandler())
-			if sessionConfig["useNikto"] == "y" or "Y": 
-				default.printInfo("NIKTOPROC Running...")
-				NIKTOPROC = Process(target=NIKTOClass.niktoScanHandler())
-			#if sessionConfig["useWfuzz"] == "y" or "Y": 
-			#	default.printInfo("WFUZZPROC Running...")
-			#	WFUZZPROC = Process(target=WFUZZClass.wfuzzScanHandler())
-			if sessionConfig["useDirb"] == "y" or "Y": 
-				default.printInfo("DIRBPROC Running...")
-				DIRBPROC = Process(target=DRIBClass.gobusterScanHandler())
-			if sessionConfig["useWpscan"] == "y" or "Y": 
-				default.printInfo("WPSCANPROC Running...")
-				WPSCANPROC = Process(target=WPSCANClass.wpscanScanHandler())
-		except Exception as e:
-			print(e)
-			print("Re-run the script with sudo and try again")
-			print("~$ sudo python3 run.py")
+		#try:
+		if sessionConfig["lastSession"]["useNmap"] == "y" or "Y": 
+			default.printInfo("NMAPPROC Running...")
+			NMAPPROC = NMAPClass.nmapScanHandler()
+			self.database.saveScanResults("nmap", NMAPPROC)
+		if sessionConfig["lastSession"]["useNikto"] == "y" or "Y": 
+			default.printInfo("NIKTOPROC Running...")
+			NIKTOPROC = NIKTOClass.niktoScanHandler()
+			self.database.saveScanResults("nikto", NIKTOPROC)
+		if sessionConfig["lastSession"]["useDirb"] == "y" or "Y": 
+			default.printInfo("DIRBPROC Running...")
+			DIRBPROC = DRIBClass.gobusterScanHandler()
+			self.database.saveScanResults("gobuster", DIRBPROC)
+		if sessionConfig["lastSession"]["useWapiti"] == "y" or "Y":
+			default.printInfo("WAPITIPROC Running...")
+			WAPITIPROC = WAPITIClass.wapitiScanHandler()
+			self.database.saveScanResults("wapiti", WAPITIPROC)
+		#except Exception as e:
+		#	print(e)
+
 
 	def showPrevScan(self):
-		scanRes = database.getScanResults(None)
-		print(scanRes)
+		scanRes = self.database.getScanResults(None)
+		
 		for tool in scanRes:
 			for scanType in scanRes[tool]:
+				print(Fore.RED + menuHelpers.jsonOFTools[tool])
 				for scan in scanRes[tool][scanType]:
-					print(Fore.RED + menuHelpers.jsonOFTools[tool])
 					print(f"{scanRes[tool][scanType][scan]}")
 
 
@@ -134,6 +130,12 @@ class Menu():
 
         
 if __name__ == "__main__":
+	if os.geteuid() != 0:
+		default.printError("You need to run this script with sudo!")
+		exit(1)
+
+	os.system("clear")
+
 	while True:
 		try:
 			menu = Menu()

@@ -1,16 +1,13 @@
 {
-    "savedSession": "True",
+    "savedSession": "False",
+    "sessionMode": "",
+    "attackSpeed": "",
+    "verboseLevel": "",
     "lastSession": {
-        "sessionMode": "A",
-        "attackSpeed": "S",
-        "verboseLevel": "L",
-        "useNmap": "y",
-        "useNikto": "y",
-        "useWfuzz": "y",
-        "useDirb": "y",
-        "useWpscan": "y",
-        "useWapiti": "y",
-        "useJoomscan": "y"
-
+        "useNmap": "",
+        "useNikto": "",
+        "useWapiti": "",
+        "useJoomscan": "",
+        "useDirb": ""
     }
 }

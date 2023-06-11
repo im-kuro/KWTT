@@ -3,6 +3,7 @@ from . import helpers
 from . import databseHelpers
 
 import subprocess
+from datetime import datetime
 
 helpersClass = helpers.IOFuncs
 
@@ -25,58 +26,56 @@ class NMAP:
  
  
 	def nmapScanHandler(self):
-		if self.attackSpeed == "s" or "S":
+		current_datetime = datetime.now()
+		funcStartTime = current_datetime.strftime("start time: %d/%m/%y | %H:%M:%S")
+		if self.attackSpeed == "s":
 			speed="T1"
-		if self.attackSpeed == "m" or "M":
-			speed="T2"
-		if self.attackSpeed == "f" or "F":
-			speed="T4"
+		if self.attackSpeed == "m":
+			speed="T3"
+		if self.attackSpeed == "f":
+			speed="T5"
 			
-		if self.sessionMode == "a" or "A":			
+		if self.sessionMode == "a":			
 			scanResults = {"agressiveScan": {}}
 				
 			# use sub proc to get commands output
 			scan1 = subprocess.check_output(f"nmap -sS -sU {speed} -A -v -PE -PP -PS80,443 -PA3389 -PU40125 -PY -g 53 --script discovery {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan2 = subprocess.check_output(f"sudo nmap -O -sF -{speed}  -A -v {self.verboseLevel} {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan3 = subprocess.check_output(f"sudo nmap -p- -sV -{speed} -v {self.verboseLevel} {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan2 = subprocess.check_output(f"sudo nmap -p- -sV -O -sF -{speed}  -A  {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
 
 			scanResults["agressiveScan"]["scan1"] = scan1
 			scanResults["agressiveScan"]["scan2"] = scan2
-			scanResults["agressiveScan"]["scan3"] = scan3
+
 			
-			self.database.saveScanResults("nmap", scanResults)
-			return scanResults
+
 
 		if self.sessionMode == "s" or "S":
-			scanResults = {"silentScan": {}}
-
-			# use sub proc to get commands output
-			scan1 = subprocess.check_output(f"sudo nmap -sS -Pn -{speed} -v {self.verboseLevel} {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan2 = subprocess.check_output(f"sudo nmap -O -{speed} -v {self.verboseLevel} {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan3 = subprocess.check_output(f"sudo nmap -p- -sV -{speed} -v {self.verboseLevel} {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-
-			scanResults["silentScan"]["scan1"] = scan1
-			scanResults["silentScan"]["scan2"] = scan2
-			scanResults["silentScan"]["scan3"] = scan3
+			scanResults = {"scan": {}}
 			
-			self.database.saveScanResults("nmap", scanResults)
-			return scanResults
+			# use sub proc to get commands output
+			scan1 = subprocess.check_output(f"sudo nmap -sS -Pn -p- -sV  -O -{speed}  {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
 
+			scanResults["scan"]["scan1"] = scan1
 
+			
 		if self.sessionMode == "d" or "D":
-			scanResults = {"defaultScan": {}}
+			scanResults = {"scan": {}}
 
 			# use sub proc to get commands output
-			scan1 = subprocess.check_output(f"sudo nmap -sU	-sS -{speed}  -v {self.verboseLevel} {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan2 = subprocess.check_output(f"sudo nmap -O -sF -{speed}  -v {self.verboseLevel} {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan3 = subprocess.check_output(f"sudo nmap -p- -sV -{speed} -v {self.verboseLevel} {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan1 = subprocess.check_output(f"sudo nmap -sU	-sS -{speed}   {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan2 = subprocess.check_output(f"sudo nmap -O -sF -{speed}   {self.ip}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
 
-			scanResults["defaultScan"]["scan1"] = scan1
-			scanResults["defaultScan"]["scan2"] = scan2
-			scanResults["defaultScan"]["scan3"] = scan3
-			
-			self.database.saveScanResults("nmap", scanResults)
-			return scanResults
+			scanResults["scan"]["scan1"] = scan1
+			scanResults["scan"]["scan2"] = scan2
+
+		current_datetime = datetime.now()
+		funcEndTime = current_datetime.strftime("end time: %d/%m/%y | %H:%M:%S")
+
+		scanResults["scan"]["funcStartTime"] = funcStartTime
+		scanResults["scan"]["funcEndTime"] = funcEndTime
+
+		self.database.saveScanResults("nmap", scanResults)
+
+		return scanResults
 			
 
 
@@ -92,6 +91,8 @@ class Nikto:
 
 
 	def niktoScanHandler(self):
+		current_datetime = datetime.now()
+		funcStartTime = current_datetime.strftime("start time: %d/%m/%y | %H:%M:%S")
 		if self.attackSpeed.lower() == "s":
 			speed = "3"
 		elif self.attackSpeed.lower() == "m":
@@ -102,10 +103,10 @@ class Nikto:
 			speed = "3"
 
 		if self.sessionMode.lower() == "a":
-			scanResults = {"aggressiveScan": {}}
+			scanResults = {"scan": {}}
 
 			scan1 = subprocess.check_output(
-                f"nikto -h {self.ip} --Tuning 123456789abcx",
+                f"nikto -h {self.ip} --Tuning 123456789abcx  -Plugins tests -c all",
                 shell=True,
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
@@ -116,42 +117,33 @@ class Nikto:
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
             )
-			scan3 = subprocess.check_output(
-                f"nikto -h {self.ip} -maxtime 60 -evasion {speed} -Plugins tests -c all",
-                shell=True,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True,
-            )
 
-			scanResults["aggressiveScan"]["scan1"] = scan1
-			scanResults["aggressiveScan"]["scan2"] = scan2
-			scanResults["aggressiveScan"]["scan3"] = scan3
 
-			self.database.saveScanResults("nikto", scanResults)
-			return scanResults
+			scanResults["scan"]["scan1"] = scan1
+			scanResults["scan"]["scan2"] = scan2
+
 
 		if self.sessionMode.lower() == "s":
-			scanResults = {"silentScan": {}}
+			scanResults = {"scan": {}}
 
 			scan1 = subprocess.check_output(
-                f"nikto -h {self.ip} -maxtime 60 -maxretries 2 -evasion {speed}",
+                f"nikto -h {self.ip} -ask=no -maxtime 60 -evasion 2 -Tuning 9 -Plugins @all -Format txt {speed}",
                 shell=True,
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
             )
 
 
-			scanResults["silentScan"]["scan1"] = scan1
+			scanResults["scan"]["scan1"] = scan1
 
 
-			self.database.saveScanResults("nikto", scanResults)
-			return scanResults
+
 
 		if self.sessionMode.lower() == "d":
-			scanResults = {"defaultScan": {}}
+			scanResults = {"scan": {}}
 
 			scan1 = subprocess.check_output(
-				f"nikto -h {self.ip} -maxtime 120 -maxretries 2 -evasion {speed}",
+				f"nikto -h {self.ip} -maxtime 120 -evasion {speed}",
                 shell=True,
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
@@ -164,82 +156,22 @@ class Nikto:
             )
 
 
-			scanResults["defaultScan"]["scan1"] = scan1
-			scanResults["defaultScan"]["scan2"] = scan2
-
-			self.database.saveScanResults("nikto", scanResults)
-			return scanResults
+			scanResults["scan"]["scan1"] = scan1
+			scanResults["scan"]["scan2"] = scan2
 
 
+		current_datetime = datetime.now()
+		funcEndTime = current_datetime.strftime("end time: %d/%m/%y | %H:%M:%S")
+
+		scanResults["scan"]["funcStartTime"] = funcStartTime
+		scanResults["scan"]["funcEndTime"] = funcEndTime
+
+		self.database.saveScanResults("nikto", scanResults)
+
+		return scanResults
+			
 
 
-class wfuzz:
-	def __init__(self, ip: str, sessionMode: str, attackSpeed: str, verboseLevel: str = "Low", debugOn: bool = False):
-		self.ip = ip
-		self.sessionMode = sessionMode
-		self.attackSpeed = attackSpeed
-		self.debugOn = debugOn
-		self.verboseLevel = verboseLevel
-		self.database = databseHelpers.databaseHelpers(debugOn=debugOn)
-
-	def wfuzzScanHandler(self):
-		if self.attackSpeed.lower() == "s":
-			speed = "--hh 0 -c -z range,1-65535"
-		elif self.attackSpeed.lower() == "m":
-			speed = "--hh 0 -c -z range,1-5000"
-		elif self.attackSpeed.lower() == "f":
-			speed = "--hh 0 -c -z range,1-1000"
-		else:
-			speed = "--hh 0 -c -z range,1-65535"
-
-		if self.sessionMode.lower() == "a":
-			scanResults = {"aggressiveScan": {}}
-
-			scan1 = subprocess.check_output(
-                f"wfuzz -u http://{self.ip}/FUZZ -z range,200-204,301,302,307,403,500 {speed}",
-                shell=True,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True,
-            )
-	
-
-			scanResults["aggressiveScan"]["scan1"] = scan1
-
-			print(scanResults)
-			self.database.saveScanResults("wfuzz", scanResults)
-			return scanResults
-
-		if self.sessionMode.lower() == "s":
-			scanResults = {"silentScan": {}}
-
-			scan1 = subprocess.check_output(
-                f"wfuzz -w common.txt -u http://{self.ip}/FUZZ -z range,200-204,301,302,307,403,500 {speed}",
-                shell=True,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True,
-            )
-
-			scanResults["silentScan"]["scan1"] = scan1
-
-
-			self.database.saveScanResults("wfuzz", scanResults)
-			return scanResults
-
-		if self.sessionMode.lower() == "d":
-			scanResults = {"defaultScan": {}}
-
-			scan1 = subprocess.check_output(
-                f"wfuzz -w common.txt -u http://{self.ip}/FUZZ -c -z range,200-204,301,302,307,403,500 {speed}",
-                shell=True,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True,
-            )
-
-			scanResults["defaultScan"]["scan1"] = scan1
-
-
-			self.database.saveScanResults("wfuzz", scanResults)
-			return scanResults
 
 
 class dirb:
@@ -255,6 +187,8 @@ class dirb:
 		self.database = databseHelpers.databaseHelpers(debugOn=debugOn)
 
 	def gobusterScanHandler(self):
+		current_datetime = datetime.now()
+		funcStartTime = current_datetime.strftime("start time: %d/%m/%y | %H:%M:%S")
 		scanResults = {"gobusterScan": {}}
 
         # Use subprocess to get command output
@@ -265,12 +199,19 @@ class dirb:
 			stderr=subprocess.STDOUT, 
 			universal_newlines=True
 		)
-
+		
 		if scan_output != "":
 			scanResults["gobusterScan"]["scan"] = scan_output
 		else: scanResults["gobusterScan"]["scan"] = f"No endpoints found with {self.wordlist}"
 
-		self.database.saveScanResults("dirb", scanResults)
+		current_datetime = datetime.now()
+		funcEndTime = current_datetime.strftime("end time: %d/%m/%y | %H:%M:%S")
+
+		scanResults["gobusterScan"]["funcStartTime"] = funcStartTime
+		scanResults["gobusterScan"]["funcEndTime"] = funcEndTime
+		
+		self.database.saveScanResults("gobuster", scanResults)
+
 		return scanResults
 
 
@@ -278,78 +219,6 @@ class dirb:
 
 
 
-
-
-
-class wpscan:
-	def __init__(self, ip: str, sessionMode: str, attackSpeed: str, verboseLevel: str = "Low", debugOn: bool = False):
-		self.ip = ip
-		self.sessionMode = sessionMode
-		self.attackSpeed = attackSpeed
-		self.debugOn = debugOn
-		self.verboseLevel = verboseLevel
-		self.database = databseHelpers.databaseHelpers(debugOn=debugOn)
-
-	def wpscanScanHandler(self):
-		if self.attackSpeed.lower() == "s":
-			speed = "--max-threads 10"
-		elif self.attackSpeed.lower() == "m":
-			speed = "--max-threads 30"
-		elif self.attackSpeed.lower() == "f":
-			speed = "--max-threads 60"
-		else:
-			speed = "--max-threads 30"
-		try:
-			if self.sessionMode.lower() == "a":
-				scanResults = {"aggressiveScan": {}}
-
-				scan1 = subprocess.check_output(
-					f"wpscan --url http://{self.ip} {speed} --enumerate u,t,p --plugins-detection aggressive",
-					shell=True,
-					stderr=subprocess.STDOUT,
-					universal_newlines=True,
-				)
-				
-				scanResults["aggressiveScan"]["scan1"] = scan1
-				
-				self.database.saveScanResults("wpscan", scanResults)
-				return scanResults
-
-			if self.sessionMode.lower() == "s":
-				scanResults = {"silentScan": {}}
-
-				scan1 = subprocess.check_output(
-					f"wpscan --url http://{self.ip} --no-banner --disable-tls-checks --random-user-agent --wp-content-dir /wp-content/ --enumerate u",
-					shell=True,
-					stderr=subprocess.STDOUT,
-					universal_newlines=True,
-				)
-
-				scanResults["aggressiveScan"]["scan1"] = scan1
-
-				self.database.saveScanResults("wpscan", scanResults)
-
-				return scanResults
-
-			if self.sessionMode.lower() == "d":
-				scanResults = {"defaultScan": {}}
-
-				scan1 = subprocess.check_output(
-					f"wpscan --url http://{self.ip} --enumerate ap",
-					shell=True,
-					stderr=subprocess.STDOUT,
-					universal_newlines=True,
-				)
-
-				scanResults["aggressiveScan"]["scan1"] = scan1
-
-				self.database.saveScanResults("wpscan", scanResults)
-				return scanResults
-		except subprocess.CalledProcessError: 
-			debug.printInfo("Most likly no wordpress running on site")
-			scanResults["aggressiveScan"]["scan1"] = "\nWP Status: Not running WordPress.\n\n"
-			self.database.saveScanResults("wpscan", scanResults)
-			return "\nWP Status: Not running WordPress.\n\n"
 
 
 class wapiti:
@@ -362,6 +231,8 @@ class wapiti:
 		self.database = databseHelpers.databaseHelpers(debugOn=debugOn)
 
 	def wapitiScanHandler(self):
+		current_datetime = datetime.now()
+		funcStartTime = current_datetime.strftime("start time: %d/%m/%y | %H:%M:%S")
 		if self.attackSpeed == "s" or self.attackSpeed == "S":
 			speed = "slow"
 		if self.attackSpeed == "m" or self.attackSpeed == "M":
@@ -371,44 +242,45 @@ class wapiti:
 
 
 		if self.sessionMode == "a" or self.sessionMode == "A":
-			scanResults = {"aggressiveScan": {}}
+			scanResults = {"scan": {}}
 
 			# Use sub proc to get command's output
-			scan1 = subprocess.check_output(f"wapiti -u {self.target} -d 5 --scope folder -f html", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan2 = subprocess.check_output(f"wapiti -u {self.target} -d 5 --scope folder -f xml", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan3 = subprocess.check_output(f"wapiti -u {self.target} -d 5 --scope folder -f txt", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan1 = subprocess.check_output(f"wapiti -u http://{self.ip} -d 5 --scope folder -f html", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan2 = subprocess.check_output(f"wapiti -u http://{self.ip} -d 5 --scope folder -f xml", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan3 = subprocess.check_output(f"wapiti -u http://{self.ip} -d 5 --scope folder -f txt", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
 
-			scanResults["aggressiveScan"]["scan1"] = scan1
-			scanResults["aggressiveScan"]["scan2"] = scan2
-			scanResults["aggressiveScan"]["scan3"] = scan3
-
-			self.database.saveScanResults("wapiti", scanResults)
-			return scanResults
+			scanResults["scan"]["scan1"] = scan1
+			scanResults["scan"]["scan2"] = scan2
+			scanResults["scan"]["scan3"] = scan3
 
 		if self.sessionMode == "s" or self.sessionMode == "S":
-			scanResults = {"silentScan": {}}
+			scanResults = {"scan": {}}
 
 			# Use sub proc to get command's output
-			scan1 = subprocess.check_output(f"wapiti -u {self.target} -d 3 --scope folder -f html", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan1 = subprocess.check_output(f"wapiti -u http://{self.ip} -d 3 --scope folder -f html", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
 
-			scanResults["silentScan"]["scan1"] = scan1
+			scanResults["scan"]["scan1"] = scan1
 
-
-			self.database.saveScanResults("wapiti", scanResults)
-			return scanResults
 
 		if self.sessionMode == "d" or self.sessionMode == "D":
-			scanResults = {"defaultScan": {}}
+			scanResults = {"scan": {}}
 
 
 			# Use sub proc to get command's output
-			scan1 = subprocess.check_output(f"wapiti -u {self.target} -d 5 --scope folder -f html", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan2 = subprocess.check_output(f"wapiti -u {self.target} -d 5 --scope folder -f xml", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-			scan3 = subprocess.check_output(f"wapiti -u {self.target} -d 5 --scope folder -f txt", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan1 = subprocess.check_output(f"wapiti -u http://{self.ip} -d 5 --scope folder -f html", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan2 = subprocess.check_output(f"wapiti -u http://{self.ip} -d 5 --scope folder -f xml", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scan3 = subprocess.check_output(f"wapiti -u http://{self.ip} -d 5 --scope folder -f txt", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
 
-			scanResults["defaultScan"]["scan1"] = scan1
-			scanResults["defaultScan"]["scan2"] = scan2
-			scanResults["defaultScan"]["scan3"] = scan3
+			scanResults["scan"]["scan1"] = scan1
+			scanResults["scan"]["scan2"] = scan2
+			scanResults["scan"]["scan3"] = scan3
 
-			self.database.saveScanResults("wapiti", scanResults)
-			return scanResults
+		current_datetime = datetime.now()
+		funcEndTime = current_datetime.strftime("end time: %d/%m/%y | %H:%M:%S")
+
+		scanResults["scan"]["funcStartTime"] = funcStartTime
+		scanResults["scan"]["funcEndTime"] = funcEndTime
+
+		self.database.saveScanResults("wapiti", scanResults)
+
+		return scanResults

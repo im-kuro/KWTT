@@ -32,6 +32,7 @@ class IOFuncs:
 
 # the class for the menu
 class Menu:
+	# https://textkool.com/ 3d
 	jsonOFTools = {
 		"nmap": r"""
 		
@@ -62,65 +63,31 @@ class Menu:
 		
 		""",
 
-		"wfuzz": r"""
+		"gobuster": r"""
 		
-		
-
- ___       __       ________  ___  ___      ________      ________     
-|\  \     |\  \    |\  _____\|\  \|\  \    |\_____  \    |\_____  \    
-\ \  \    \ \  \   \ \  \__/ \ \  \\\  \    \|___/  /|    \|___/  /|   
- \ \  \  __\ \  \   \ \   __\ \ \  \\\  \       /  / /        /  / /   
-  \ \  \|\__\_\  \   \ \  \_|  \ \  \\\  \     /  /_/__      /  /_/__  
-   \ \____________\   \ \__\    \ \_______\   |\________\   |\________\
-    \|____________|    \|__|     \|_______|    \|_______|    \|_______|
-                                                                       
-                                                                       
-                                                                       
-		
-		 """,
-
-		"dirb": r"""
-		
-		
- ________      ________      ___      ________     
-|\   ___ \    |\   __  \    |\  \    |\   __  \    
-\ \  \_|\ \   \ \  \|\  \   \ \  \   \ \  \|\ /_   
- \ \  \ \\ \   \ \   _  _\   \ \  \   \ \   __  \  
-  \ \  \_\\ \   \ \  \\  \|   \ \  \   \ \  \|\  \ 
-   \ \_______\   \ \__\\ _\    \ \__\   \ \_______\
-    \|_______|    \|__|\|__|    \|__|    \|_______|
-                                                   
-                                                                                          
+              __                       __                   
+             /\ \                     /\ \__                
+   __     ___\ \ \____  __  __    ____\ \ ,_\    __   _ __  
+ /'_ `\  / __`\ \ '__`\/\ \/\ \  /',__\\ \ \/  /'__`\/\`'__\
+/\ \L\ \/\ \L\ \ \ \L\ \ \ \_\ \/\__, `\\ \ \_/\  __/\ \ \/ 
+\ \____ \ \____/\ \_,__/\ \____/\/\____/ \ \__\ \____\\ \_\ 
+ \/___L\ \/___/  \/___/  \/___/  \/___/   \/__/\/____/ \/_/ 
+   /\____/                                                  
+   \_/__/                                                                              
 		
 		
 		""",
 
-		"wpscan": r"""
-		
-		
- ___       __       ________    ________       ________      ________      ________      
-|\  \     |\  \    |\   __  \  |\   ____\     |\   ____\    |\   __  \    |\   ___  \    
-\ \  \    \ \  \   \ \  \|\  \ \ \  \___|_    \ \  \___|    \ \  \|\  \   \ \  \\ \  \   
- \ \  \  __\ \  \   \ \   ____\ \ \_____  \    \ \  \        \ \   __  \   \ \  \\ \  \  
-  \ \  \|\__\_\  \   \ \  \___|  \|____|\  \    \ \  \____    \ \  \ \  \   \ \  \\ \  \ 
-   \ \____________\   \ \__\       ____\_\  \    \ \_______\   \ \__\ \__\   \ \__\\ \__\
-    \|____________|    \|__|      |\_________\    \|_______|    \|__|\|__|    \|__| \|__|
-                                  \|_________|                                           
-                                                                                         
-                                                                                         
-		
-		
-		""",
 		"wapiti": r"""
 		
 		
- ___       __       ________      ________    ___      _________    ___      _________   
-|\  \     |\  \    |\   __  \    |\   __  \  |\  \    |\___   ___\ |\  \    |\___   ___\ 
-\ \  \    \ \  \   \ \  \|\  \   \ \  \|\  \ \ \  \   \|___ \  \_| \ \  \   \|___ \  \_| 
- \ \  \  __\ \  \   \ \   __  \   \ \   ____\ \ \  \       \ \  \   \ \  \       \ \  \  
-  \ \  \|\__\_\  \   \ \  \ \  \   \ \  \___|  \ \  \       \ \  \   \ \  \       \ \  \ 
-   \ \____________\   \ \__\ \__\   \ \__\      \ \__\       \ \__\   \ \__\       \ \__\
-    \|____________|    \|__|\|__|    \|__|       \|__|        \|__|    \|__|        \|__|
+ ___       __       ________      ________    ___      _________    ___
+|\  \     |\  \    |\   __  \    |\   __  \  |\  \    |\___   ___\ |\  \
+\ \  \    \ \  \   \ \  \|\  \   \ \  \|\  \ \ \  \   \|___ \  \_| \ \  \
+ \ \  \  __\ \  \   \ \   __  \   \ \   ____\ \ \  \       \ \  \   \ \  \
+  \ \  \|\__\_\  \   \ \  \ \  \   \ \  \___|  \ \  \       \ \  \   \ \  \ 
+   \ \____________\   \ \__\ \__\   \ \__\      \ \__\       \ \__\   \ \__\ 
+    \|____________|    \|__|\|__|    \|__|       \|__|        \|__|    \|__| 
                                                                                          
                                                                                                                                                                             
 		
@@ -199,7 +166,7 @@ class Menu:
 
 		for line in randLogo.splitlines():
 			print(Fore.RED +  line)
-			time.sleep(0.2)
+			time.sleep(0.1)
 		
 	def getSessionConfig():
 		""" ask the user all needed questions to get config
@@ -221,23 +188,74 @@ class Menu:
 									("Agressive", "A"), ("Silent", "S"), ("Default", "D"))
 
 		# Prompt for Attack Speed
-		attackSpeed = getValidInput("Attack Speed (Slow/s, Medium/m, Fast/f)",
+		attackSpeed = getValidInput("Attack Speed (Slow/s - 30m-4h, Medium/m - 10m-1h, Fast/f - 2m-30m) ",
 									("Slow", "S"), ("Medium", "M"), ("Fast", "F"))
 
 		# Prompt for Verbose Level
 		verboseLevel = getValidInput("Verbose Level (Low/l, Medium/m, High/h)",
 								("Low", "L"), ("Medium", "M"), ("High", "H"))
 
+		jsonOFToolsData = {
+			"nmap": {
+				"description": "NMAP is a network scanning tool that performs various scans on a target IP.",
+				"link": "https://nmap.org/"
+			},
+			"nikto": {
+				"description": "Nikto is a web server scanning tool that scans a web server for vulnerabilities and misconfigurations.",
+				"link": "https://cirt.net/Nikto2"
+			},
+			"dirb": {
+				"description": "Dirb is a web content scanner that looks for hidden directories and files on a web server.",
+				"link": "https://tools.kali.org/web-applications/dirb"
+			},
 
-		useNmap = IOFuncs.Default.getUserInput("Use Nmap? (https://nmap.org/)")
-		useNikto = IOFuncs.Default.getUserInput("Use Nikto? (https://cirt.net/Nikto2)")
-		useWfuzz = IOFuncs.Default.getUserInput("Use Wfuzz? (https://www.kali.org/tools/wfuzz/)")
-		useDirb = IOFuncs.Default.getUserInput("Use Dirb? (https://tools.kali.org/web-applications/dirb)")
-		useWpscan = IOFuncs.Default.getUserInput("Use Wpscan? (https://wpscan.org/)")
-		useWapiti = IOFuncs.Default.getUserInput("Use Wapiti? (https://wapiti.sourceforge.io/)")
-		useJoomscan = IOFuncs.Default.getUserInput("Use Joomscan? (https://www.kali.org/tools/joomscan/)")
+			"wapiti": {
+				"description": "Wapiti is a web application vulnerability scanner that identifies security vulnerabilities.",
+				"link": "https://wapiti.sourceforge.io/"
+			},
+			"joomscan": {
+				"description": "Joomscan is a Joomla vulnerability scanner that detects security vulnerabilities in Joomla CMS.",
+				"link": "https://www.kali.org/tools/joomscan/"
+			}
+		}
+		
+		sessionObj = {
+			"savedSession": "False",
+			"sessionMode": sessionMode.lower(), 
+			"attackSpeed": attackSpeed.lower(), 
+			"verboseLevel": verboseLevel.lower(),
+			"lastSession": {
+				"useNmap": "",
+				"useNikto": "",
+				"useWapiti": "",
+				"useJoomscan": ""   
+			}
+				
+			}
+		while True:
+			for tool in jsonOFToolsData:
+				i = IOFuncs.Default.getUserInput(f"Would like to use {tool}? (enter ? for more info)").lower()
 
-		return {"sessionMode": sessionMode, "attackSpeed": attackSpeed, "verboseLevel": verboseLevel, "useNmap": useNmap, "useNikto": useNikto, "useWfuzz": useWfuzz, "useDirb": useDirb, "useWpscan": useWpscan, "useWapiti": useWapiti, "useJoomscan": useJoomscan}
+				if i == "?":
+					IOFuncs.Default.printInfo(jsonOFToolsData[tool]["description"])
+					IOFuncs.Default.printInfo(jsonOFToolsData[tool]["link"])
+
+					z = IOFuncs.Default.getUserInput(f"Do you want to use {tool}?").lower()
+					
+					if z == "y" or z == "n":
+						sessionObj["lastSession"][f"use{tool.replace(tool[0], tool[0].capitalize())}"] = z
+
+					else:
+						IOFuncs.Default.printError("Invalid input")
+				elif i == "y" or i == "n":
+					
+					sessionObj["lastSession"][f"use{tool.replace(tool[0], tool[0].capitalize())}"] = i
+
+				else:
+					IOFuncs.Default.printError("Invalid input")
+			break
+		return sessionObj
+
 
 
 	def checkForTools() -> bool:
@@ -246,7 +264,7 @@ class Menu:
 		Returns:
 			bool: true = worked false = no workeded
 		"""
-		arrOfTools = ["nmap", "nikto", "wfuzz", "dirb", "wpscan", "wapiti", "joomscan"]
+		arrOfTools = ["nmap", "nikto", "dirb", "wapiti", "joomscan"]
 		uninstalledTools = []
 
 		for x in arrOfTools:

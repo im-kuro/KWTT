@@ -56,19 +56,16 @@ class databaseHelpers:
 
     # saves the settings a user is using 
     def saveUserSession(self, sessionData: json) -> bool:
-        
-        #try:
-        sessionsDB = json.loads(open("database/sessions.json").read())
-
-        
-        sessionsDB = sessionData
-        sessionsDB["savedSession"] = "True"
-        
-        json.dump(sessionsDB, open("database/sessions.json", "w"))            
-        
-        #except Exception as e:
-        #    if self.debugOn == True: debug.printError("error saving user session",e)
-        #    return False
+        try:
+            sessionsDB = json.loads(open("database/sessions.json").read())     
+            sessionsDB = sessionData
+            sessionsDB["savedSession"] = "True"
+            
+            json.dump(sessionsDB, open("database/sessions.json", "w"))            
+            
+        except Exception as e:
+            if self.debugOn: debug.printError("error saving user session",e)
+            return False
         
 
     # returns the past session
@@ -78,7 +75,7 @@ class databaseHelpers:
             return sessionsDB
 
         except Exception as e:
-            if self.debugOn == True: debug.printError(e)
+            if self.debugOn: debug.printError("error getting past user session",e)
             return False
 
 
@@ -92,7 +89,7 @@ class databaseHelpers:
             json.dump(scanResultsDB, open("database/scanResults.json", "w"))   
         
         except Exception as e:
-            if self.debugOn == True: debug.printError("Error with saving scan results", e)
+            if self.debugOn: debug.printError("Error with saving scan results", e)
             return False
 
 
@@ -102,8 +99,8 @@ class databaseHelpers:
             if toolName == None:
                 return scanResultsDB
             else:
-                return scanResults[toolName]
+                return scanResultsDB[toolName]
         except Exception as e:
-            if self.debugOn == True: debug.printError(e)
+            if self.debugOn: debug.printError("error getting user scan results",e)
             return False
 

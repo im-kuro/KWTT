@@ -1,9 +1,9 @@
-# Kuros WTT v0.3
+# Kuros WTT v0.4
 ## (Web Testing Toolkit)
 
 [x] + https://linktr.ee/devkuro  <3
 
-## 1.0 Introduction
+## 1.0 Introduction (Unrealeased)
 ### What is Kuros WTT?
 Kuros WTT is a web testing toolkit that is designed to make web testing easier. 
 It is a collection of tools that can be used to test web applications.
@@ -14,7 +14,6 @@ It will not exploit the vulnerabilities, but it will alert you to them.
 
 (this script is the automation of many other tools)
 
-
 (v0.3)
 
 
@@ -23,19 +22,17 @@ https://github.com/im-kuro/KWTT/assets/86091489/17bc3300-adb0-499e-b1e2-227d787e
 
 
 
-#### Exeptected date: 6/30/23
+#### Exeptected date: 7/5/23
 ### 1.0 Features
 - [x] Port Scanning
 - [x] Directory Bruteforcing
-- [x] Toolkits of diffrent scans
 - [x] Vulnerability Scanning
 - [x] Verbose outputs & debug output
-- [x] Tools like nmap, sublister, wfuzz, joomscan & more
+- [x] Tools like nmap, sublister, wfuzz, joomscan & more tools
 - [x] & more!
 
 
 ### Future Features
-- [x] Subdomain Enumeration
 - [x] File Upload Bruteforcing
 - [x] Proxy Support
 - [x] IP list scanning for automation of scans (you can pass in a json/txt file with a list of ips to auto scan, sorting them based off how vulnerable  they are)

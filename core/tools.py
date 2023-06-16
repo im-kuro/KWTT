@@ -284,3 +284,44 @@ class wapiti:
 		self.database.saveScanResults("wapiti", scanResults)
 
 		return scanResults
+
+
+
+class JoomScan:
+	def __init__(self, target: str, sessionMode: str, verboseLevel: str = "Low", debugOn: bool = False):
+		self.target = target
+		self.sessionMode = sessionMode
+		self.debugOn = debugOn
+		self.verboseLevel = verboseLevel
+		self.database = databseHelpers.databaseHelpers(debugOn=debugOn)
+
+	def joomscanHandler(self):
+		current_datetime = datetime.now()
+		funcStartTime = current_datetime.strftime("start time: %d/%m/%y | %H:%M:%S")
+
+		scanResults = {}
+
+		if self.sessionMode == "a":
+			# Perform aggressive scan
+			scanOutput = subprocess.check_output(f"joomscan -a -u {self.target}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scanResults["aggressiveScan"] = scanOutput
+
+		elif self.sessionMode == "s":
+			# Perform standard scan
+			scanOutput = subprocess.check_output(f"joomscan -u {self.target}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scanResults["standardScan"] = scanOutput
+
+		elif self.sessionMode == "p":
+			# Perform plugin scan
+			scanOutput = subprocess.check_output(f"joomscan -p -u {self.target}", shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+			scanResults["pluginScan"] = scanOutput
+
+		current_datetime = datetime.now()
+		funcEndTime = current_datetime.strftime("end time: %d/%m/%y | %H:%M:%S")
+
+		scanResults["funcStartTime"] = funcStartTime
+		scanResults["funcEndTime"] = funcEndTime
+
+		self.database.saveScanResults("joomscan", scanResults)
+
+		return scanResults

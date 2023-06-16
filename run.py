@@ -6,19 +6,14 @@ import argparse, json, os
 from colorama import Fore
 
 argsToParse = argparse.ArgumentParser(description="Kuros Web Testing Tool - @devkuro - GH: im-kuro")
-
 argsToParse.add_argument("--fix", "-f", help="Fix broken features", default=False, action='store_true')
 argsToParse.add_argument("--lastScan", "-l", help="Show last scan results", default=False, action='store_true')
 argsToParse.add_argument("--wordlist", "-w", help="The wordlist youd like to use for dirb", default=None)
-
-
 argsToParse.add_argument("--debug", "-d", help="Run with debug output", default=False, action='store_true')
-
 argParsedObj = argsToParse.parse_args()
 
 helpersClass = helpers.IOFuncs
 menuHelpers = helpers.Menu
-
 debug = helpersClass.Debug
 default = helpersClass.Default
 
@@ -55,7 +50,9 @@ class Menu():
 					saveSesh = self.database.saveUserSession(sessionConfig)
 					if saveSesh == True:
 						debug.printSuccess("Saved session config!")
-		
+				else: 
+					default.printError("Invalid Option...")
+					self.main()
 			elif pastSession["savedSession"] == "False":
 					# but if they dont have a past sesh saved, ask them to make one
 				sessionConfig = menuHelpers.getSessionConfig()
@@ -64,12 +61,11 @@ class Menu():
 
 				if saveSesh == True:
 					debug.printSuccess("Saved session config!")
-			
-			return sessionConfig
+
 		except Exception as e:
 			if self.debugOn == True: debug.printError("Error with sessions", str(e))
 			elif self.debugOn == False: default.printError("Error with sessions")
-
+		return sessionConfig
 		""" _____________________ """
   
 		""" SETUP SCANS """
@@ -92,27 +88,32 @@ class Menu():
 		NIKTOClass = tools.Nikto(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
 		DRIBClass = tools.dirb(tarIP, argParsedObj.wordlist)
 		WAPITIClass = tools.wapiti(tarIP, sessionConfig["sessionMode"], sessionConfig["attackSpeed"])
+		JOOMSCANClass = tools.JoomScan(tarIP, sessionConfig["sessionMode"])
 
-		# run procs
-		#try:
-		if sessionConfig["lastSession"]["useNmap"] == "y" or "Y": 
-			default.printInfo("NMAPPROC Running...")
-			NMAPPROC = NMAPClass.nmapScanHandler()
-			self.database.saveScanResults("nmap", NMAPPROC)
-		if sessionConfig["lastSession"]["useNikto"] == "y" or "Y": 
-			default.printInfo("NIKTOPROC Running...")
-			NIKTOPROC = NIKTOClass.niktoScanHandler()
-			self.database.saveScanResults("nikto", NIKTOPROC)
-		if sessionConfig["lastSession"]["useDirb"] == "y" or "Y": 
-			default.printInfo("DIRBPROC Running...")
-			DIRBPROC = DRIBClass.gobusterScanHandler()
-			self.database.saveScanResults("gobuster", DIRBPROC)
-		if sessionConfig["lastSession"]["useWapiti"] == "y" or "Y":
-			default.printInfo("WAPITIPROC Running...")
-			WAPITIPROC = WAPITIClass.wapitiScanHandler()
-			self.database.saveScanResults("wapiti", WAPITIPROC)
-		#except Exception as e:
-		#	print(e)
+        # Run procs
+		try:
+			if sessionConfig["lastSession"]["useNmap"].lower() == "y":
+				default.printInfo("NMAPPROC Running...")
+				NMAPPROC = NMAPClass.nmapScanHandler()
+				self.database.saveScanResults("nmap", NMAPPROC)
+			if sessionConfig["lastSession"]["useNikto"].lower() == "y":
+				default.printInfo("NIKTOPROC Running...")
+				NIKTOPROC = NIKTOClass.niktoScanHandler()
+				self.database.saveScanResults("nikto", NIKTOPROC)
+			if sessionConfig["lastSession"]["useDirb"].lower() == "y":
+				default.printInfo("DIRBPROC Running...")
+				DIRBPROC = DRIBClass.gobusterScanHandler()
+				self.database.saveScanResults("gobuster", DIRBPROC)
+			if sessionConfig["lastSession"]["useWapiti"].lower() == "y":
+				default.printInfo("WAPITIPROC Running...")
+				WAPITIPROC = WAPITIClass.wapitiScanHandler()
+				self.database.saveScanResults("wapiti", WAPITIPROC)
+			if sessionConfig["lastSession"]["useJoomscan"].lower() == "y":
+				default.printInfo("JOOMSCANPROC Running...")
+				JOOMSCANPROC = WAPITIClass.wapitiScanHandler()
+				self.database.saveScanResults("joomscan", JOOMSCANPROC)
+		except Exception as e:
+			debug.printError("Unknown error starting procs", e)
 
 
 	def showPrevScan(self):
@@ -139,13 +140,14 @@ if __name__ == "__main__":
 	while True:
 		try:
 			menu = Menu()
+			# print ACII art logo
 			menuHelpers.startupMenu(menuHelpers.arrayOfLogos)
 
-			if argParsedObj.fix == True:
+			# basic script setttings checks
+			if argParsedObj.fix:
 				database.BROKEN_DATABASE_CLEANUP()
 				exit(0)
-
-			if argParsedObj.lastScan == True:
+			if argParsedObj.lastScan:
 				menu.showPrevScan()
 				exit(0)
 
@@ -155,8 +157,9 @@ if __name__ == "__main__":
 				menu.initThreads(seshConfig)
 				default.printInfo("Goodbye, thanks for using KWTT")
 				break
-			except Exception as e: debug.printError("Unknown error starting procs", e)
-				
+			except Exception as e: 
+				debug.printError("Unknown error starting procs", e)
+				continue
 		except KeyboardInterrupt:
 			z = default.getUserInput("Are you sure you want to exit the program?")
 			if z == "y" or z == "Y":
